@@ -8,18 +8,27 @@ func main() {
 	player := 'X'
 
 	for {
-		fmt.Printf("Player %c, enter row and column: ", player)
+		board.Print()
 
-		n, err := fmt.Scanln(&r, &c)
-		if err != nil || n != 2 {
-			fmt.Println("Please enter two integers likeL: 0 2")
-			continue
-		}
+		if player == 'X' {
+			fmt.Printf("Player %c, enter row and column: ", player)
 
-		err = board.PlaceStone(r, c, player)
-		if err != nil {
-			fmt.Println(err)
-			continue
+			n, err := fmt.Scanln(&r, &c)
+			if err != nil || n != 2 {
+				fmt.Println("Please enter two integers like: 0 2")
+				continue
+			}
+
+			err = board.PlaceStone(r, c, player)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		} else {
+			// move := BestMoveOnePly(board, 'O')
+			move := BestMoveMinimax(board, 'O', 2)
+			fmt.Printf("Computer chooses: %d %d\n", move.row, move.col)
+			_ = board.PlaceStone(move.row, move.col, 'O')
 		}
 
 		if board.HasFive(player) {
@@ -28,13 +37,19 @@ func main() {
 			break
 		}
 
-		board.Print()
+		fmt.Println("Evaluation for X:", Evaluate(board, 'X'))
+		fmt.Println("Evaluation for O:", Evaluate(board, 'O'))
+
+		if board.IsFull() {
+			board.Print()
+			fmt.Println("It's a draw!")
+			break
+		}
 
 		if player == 'X' {
 			player = 'O'
 		} else {
 			player = 'X'
 		}
-
 	}
 }

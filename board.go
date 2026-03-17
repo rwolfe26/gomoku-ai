@@ -2,6 +2,11 @@ package main
 
 import "fmt"
 
+type Move struct {
+	row int
+	col int
+}
+
 type Board struct {
 	size int
 	grid [][]rune
@@ -44,6 +49,49 @@ func (b *Board) PlaceStone(r, c int, player rune) error {
 	}
 	b.grid[r][c] = player
 	return nil
+}
+
+func (b Board) Clone() Board {
+	newBoard := NewBoard(b.size)
+	for i := 0; i < b.size; i++ {
+		for j := 0; j < b.size; j++ {
+			newBoard.grid[i][j] = b.grid[i][j]
+		}
+	}
+	return newBoard
+}
+
+func (b Board) LegalMoves() []Move {
+	moves := []Move{}
+	for r := 0; r < b.size; r++ {
+		for c := 0; c < b.size; c++ {
+			if b.grid[r][c] == '.' {
+				moves = append(moves, Move{row: r, col: c})
+			}
+		}
+	}
+	return moves
+}
+
+func (b Board) IsFull() bool {
+	for r := 0; r < b.size; r++ {
+		for c := 0; c < b.size; c++ {
+			if b.grid[r][c] == '.' {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (b Board) Winner() rune {
+	if b.HasFive('X') {
+		return 'X'
+	}
+	if b.HasFive('O') {
+		return 'O'
+	}
+	return '.'
 }
 
 func (b Board) HasFive(player rune) bool {
